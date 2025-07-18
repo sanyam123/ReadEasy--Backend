@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import OpenAI from 'openai';
 import { AuthService } from '../lib/auth.js';
 import { Database } from '../lib/database.js';

@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     let responseArticles = articles;
     
     if (includeContent) {
-      // Fetch full article details
+      // Fetch full article details including highlights
       responseArticles = await Promise.all(
         articles.map(async (article) => {
           const fullArticle = await Database.getArticle(article.id);
@@ -43,11 +43,20 @@ export default async function handler(req, res) {
       );
     }
     
+    // Add highlights summary to response
+    const articlesWithHighlightInfo = responseArticles.map(article => ({
+      ...article,
+      highlights_count: article.highlights ? article.highlights.length : 0,
+      has_highlights: article.highlights && article.highlights.length > 0,
+      last_highlighted: article.lastHighlighted || null
+    }));
+    
     res.status(HTTP_STATUS.OK).json({
       success: true,
-      articles: responseArticles,
+      articles: articlesWithHighlightInfo,
       count: articles.length,
-      max_articles: 3
+      max_articles: 3,
+      total_highlights: articlesWithHighlightInfo.reduce((total, article) => total + (article.highlights_count || 0), 0)
     });
     
   } catch (error) {
