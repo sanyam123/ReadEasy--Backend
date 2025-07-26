@@ -25,23 +25,16 @@ export default async function handler(req, res) {
     
     const { user } = auth;
     
-    // Get user's articles
+    // Get user's articles (summary data)
     const articles = await Database.getUserArticles(user.id);
     
-    // Get detailed flag from query params
-    const includeContent = req.query.detailed === 'true';
-    
-    let responseArticles = articles;
-    
-    if (includeContent) {
-      // Fetch full article details including highlights
-      responseArticles = await Promise.all(
-        articles.map(async (article) => {
-          const fullArticle = await Database.getArticle(article.id);
-          return fullArticle || article;
-        })
-      );
-    }
+    // ALWAYS fetch full article details including content and highlights
+    const responseArticles = await Promise.all(
+      articles.map(async (article) => {
+        const fullArticle = await Database.getArticle(article.id);
+        return fullArticle || article;
+      })
+    );
     
     // Add highlights summary to response
     const articlesWithHighlightInfo = responseArticles.map(article => ({
