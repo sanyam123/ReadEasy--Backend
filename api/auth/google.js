@@ -5,15 +5,12 @@ import { AuthService } from '../../lib/auth.js';
 import { Database } from '../../lib/database.js';
 import { validateUser } from '../../lib/validation.js';
 import { HTTP_STATUS, ERROR_MESSAGES } from '../../lib/constants.js';
+import { handleCORS } from '../../lib/cors.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  // Handle CORS
+  if (handleCORS(req, res)) {
+    return; // Preflight request handled
   }
   
   if (req.method !== 'POST') {
